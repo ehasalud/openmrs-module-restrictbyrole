@@ -61,6 +61,10 @@
 		<point>org.openmrs.api.PatientSetService</point>
 		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.GetManyPatientsAdvisor</class>
 	</advice>
+	<advice>
+		<point>org.openmrs.api.EncounterService</point>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.GetEncounterAdvisor</class>
+	</advice>
 	<!-- /AOP -->
 
 	<!-- Internationalization -->

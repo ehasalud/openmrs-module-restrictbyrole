@@ -6,36 +6,47 @@
 
 <h2><spring:message code="restrictbyrole.title"/></h2>
 
-<h3><spring:message code="restrictbyrole.current"/></h3>
-<c:if test="${fn:length(restrictionList) == 0}">
-	<spring:message code="general.none"/>
-</c:if>
-<c:if test="${fn:length(restrictionList) != 0}">
-	<form method="post">
-		<table>
-			<tr>
-				<th></th>
-				<th><spring:message code="general.id"/></th>
-				<th><spring:message code="restrictbyrole.role"/></th>
-				<th><spring:message code="restrictbyrole.search"/></th>
-			</tr>
-			<c:forEach var="restriction" items="${restrictionList}">
-				<tr>
-					<td><input type="checkbox" name="deleteId" value="${restriction.id}" /></td>
-					<td>${restriction.id}</td>
-					<td>${restriction.role.role}</td>
-					<td>
-						${restriction.serializedObject.name}
-						<small>(${restriction.serializedObject.description})</small>
-					</td>
-				</tr>
-			</c:forEach>
-		</table>
-		<input type="submit" value="<spring:message code="general.delete" />"/>
-	</form>
-</c:if>
+<b class="boxHeader"><spring:message code="restrictbyrole.current"/></b>
 
-<br/>
+<div class="box">
+	<c:if test="${fn:length(restrictionList) == 0}">
+		<spring:message code="general.none"/>
+	</c:if>
+	<c:if test="${fn:length(restrictionList) != 0}">
+		<form method="post">
+			<table>
+				<thead>
+				<tr>
+					<th></th>
+					<th></th>
+					<th><spring:message code="general.id"/></th>
+					<th><spring:message code="restrictbyrole.role"/></th>
+					<th><spring:message code="restrictbyrole.search"/></th>
+				</tr>
+				</thead>
+				<tbody>
+				<c:forEach var="restriction" items="${restrictionList}">
+					<tr>
+						<td><input type="checkbox" name="deleteId" value="${restriction.id}" /></td>
+						<td><a href="restrictionForm.form?restrictionId=${restriction.id}">
+							<img src="<c:url value='/images/edit.gif'/>" border="0"/></a>
+						</td>
+						<td>${restriction.id}</td>
+						<td>${restriction.role.role}</td>
+						<td>
+							${restriction.serializedObject.name}
+							<small>(${restriction.serializedObject.description})</small>
+						</td>
+					</tr>
+				</c:forEach>
+				</tbody>
+			</table>
+			<br/>
+			<input type="submit" value="<spring:message code="general.delete" />"/>
+		</form>
+	</c:if>
+</div>
+
 <br/>
 <a href="restrictionForm.form"><spring:message code="general.add"/></a>
 
