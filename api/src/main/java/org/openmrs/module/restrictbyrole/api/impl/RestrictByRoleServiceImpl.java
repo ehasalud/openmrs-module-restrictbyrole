@@ -20,7 +20,6 @@ import java.util.Set;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.Role;
@@ -31,14 +30,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.query.person.PersonQueryResult;
-import org.openmrs.module.reporting.query.person.definition.PersonQuery;
-import org.openmrs.module.reporting.query.person.service.PersonQueryService;
 import org.openmrs.module.reporting.serializer.ReportingSerializer;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
 import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 import org.openmrs.module.restrictbyrole.api.db.RestrictByRoleDAO;
-import org.openmrs.module.serialization.xstream.XStreamSerializer;
 import org.openmrs.serialization.SerializationException;
 
 /**

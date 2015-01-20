@@ -25,17 +25,48 @@ import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
  */
 public interface RestrictByRoleDAO {
 	
+	/**
+	 * Create a new RoleRestriction
+	 * @param roleRestriction
+	 */
 	public void createRoleRestriction(RoleRestriction roleRestriction);
 	
+	/**
+	 * Update an existing RoleRestriction
+	 * @param roleRestriction
+	 */
 	public void updateRoleRestriction(RoleRestriction roleRestriction);
 	
+	/**
+	 * Delete a RoleRestriction
+	 * @param roleRestriction
+	 */
 	public void deleteRoleRestriction(RoleRestriction roleRestriction);
 	
+	/**
+	 * Get the RoleRestriction with the id provided
+	 * @param id Id of the RoleRestriction
+	 * @return
+	 */
 	public RoleRestriction getRoleRestriction(Integer id);
 	
+	/**
+	 * Get all RoleRestrictions defined
+	 * @return List of RoleRestrictions
+	 */
 	public List<RoleRestriction> getRoleRestrictions();
 
+	/**
+	 * Get the RoleRestrictions assigned to the provided Role. 
+	 * @param role Role to get the restrictions for
+	 * @param includeRetired If include or not include retired RoleRestrictions
+	 * @return List of RoleRestrictions associated to a Role
+	 */
 	public List<RoleRestriction> getRoleRestrictions(Role role, Boolean includeRetired);
 	
+	/**
+	 * Retire the RoleRestrictions that contain the CohortDefinition provided
+	 * @param cohort The CohortDefinition
+	 */
 	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort);
 }

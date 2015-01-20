@@ -26,6 +26,10 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 
+/**
+ * Advisor that intercepts the following methods: {@link org.openmrs.api.PatientService#getPatient(Integer)}
+ *  and {@link org.openmrs.api.PatientService#updatePatient(Patient)}
+ */
 public class GetPatientAdvisor extends StaticMethodMatcherPointcutAdvisor implements Advisor {
 
 	private static final long serialVersionUID = 1L;

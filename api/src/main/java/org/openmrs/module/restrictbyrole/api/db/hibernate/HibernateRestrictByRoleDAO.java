@@ -36,14 +36,19 @@ public class HibernateRestrictByRoleDAO implements RestrictByRoleDAO {
 	
 	private SessionFactory sessionFactory;
 	
+	@Override
 	public RoleRestriction getRoleRestriction(Integer id) throws DAOException {
 		return (RoleRestriction) getSessionFactory().getCurrentSession().get(RoleRestriction.class, id);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<RoleRestriction> getRoleRestrictions() throws DAOException {
 		return getSessionFactory().getCurrentSession().createQuery("from RoleRestriction").list();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<RoleRestriction> getRoleRestrictions(Role role, Boolean includeRetired) throws DAOException {
 		Criteria crit = getSessionFactory().getCurrentSession().createCriteria(RoleRestriction.class);
 		crit.add(Restrictions.eq("role", role));
@@ -53,14 +58,17 @@ public class HibernateRestrictByRoleDAO implements RestrictByRoleDAO {
 		return crit.list();
 	}
 	
+	@Override
 	public void createRoleRestriction(RoleRestriction roleRestriction) throws DAOException {
 		getSessionFactory().getCurrentSession().save(roleRestriction);
 	}
 
+	@Override
 	public void deleteRoleRestriction(RoleRestriction roleRestriction) throws DAOException {
 		getSessionFactory().getCurrentSession().delete(roleRestriction);
 	}
 
+	@Override
 	public void updateRoleRestriction(RoleRestriction roleRestriction) throws DAOException {
 		if (roleRestriction.isRetired()){
 			roleRestriction.setRetired(false);
@@ -69,15 +77,8 @@ public class HibernateRestrictByRoleDAO implements RestrictByRoleDAO {
 		}
 		getSessionFactory().getCurrentSession().update(roleRestriction);
 	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
+	
+	@Override
 	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort) {
 		List <RoleRestriction> roleRestrictions = this.getRoleRestrictionsWithCohortDefinition(cohort);
 		
@@ -88,6 +89,14 @@ public class HibernateRestrictByRoleDAO implements RestrictByRoleDAO {
 		for (RoleRestriction rr : roleRestrictions ){
 			rr.setRetired(true);
 		}
+	}
+	
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 	
 	@SuppressWarnings("unchecked")

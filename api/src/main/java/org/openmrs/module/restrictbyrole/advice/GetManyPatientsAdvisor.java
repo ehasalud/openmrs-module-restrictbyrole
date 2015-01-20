@@ -31,6 +31,11 @@ import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 
+/**
+ * Advisor that intercepts the following methods: {@link org.openmrs.api.PatientSetService#getAllPatients()},
+ * {@link org.openmrs.api.PatientService#findPatients(String, boolean)} and 
+ * {@link org.openmrs.api.PatientService#getPatients()}
+ */
 public class GetManyPatientsAdvisor extends StaticMethodMatcherPointcutAdvisor implements Advisor {
 
 	private static final long serialVersionUID = 1L;
