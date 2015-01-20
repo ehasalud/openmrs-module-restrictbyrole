@@ -32,4 +32,17 @@
         
     </changeSet>
     
+    <changeSet author="vgarciabnz" id="restrictbyrole-20150121-1040">
+    
+    	<preConditions onFail="MARK_RAN">
+    		<not><columnExists tableName="restrictbyrole_role_restriction" columnName="retired"/></not>
+    	</preConditions>
+    	
+    	<addColumn tableName="restrictbyrole_role_restriction">
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false"
+            valueBoolean="false"></column>
+        </addColumn>
+        
+    </changeSet>
+    
 </databaseChangeLog>

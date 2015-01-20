@@ -99,7 +99,14 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getRoleRestrictions(Role)
 	 */
 	public List<RoleRestriction> getRoleRestrictions(Role role) {
-		return getDao().getRoleRestrictions(role);
+		return getDao().getRoleRestrictions(role, true);
+	}
+	
+	/**
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getActiveRoleRestrictions(Role)
+	 */
+	public List<RoleRestriction> getActiveRoleRestrictions(Role role) {
+		return getDao().getRoleRestrictions(role, false);
 	}
 
 	/**
@@ -140,6 +147,20 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 		log.debug("current user has " + ret.size() + " restrictions");
 		return ret;
 	}
+	/**
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserActiveRestrictions()
+	 */
+	@Override
+	public Set<RoleRestriction> getCurrentUserActiveRestrictions() {
+		if (!Context.isAuthenticated())
+			return null;
+		Set<Role> roles = Context.getAuthenticatedUser().getAllRoles();
+		Set<RoleRestriction> ret = new HashSet<RoleRestriction>();
+		for (Role role : roles)
+			ret.addAll(getActiveRoleRestrictions(role));
+		log.debug("current user has " + ret.size() + " active restrictions");
+		return ret;
+	}
 	
 	/**
 	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getAllSerializedObjects()
@@ -152,7 +173,7 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserRestrictedPatientSet()
 	 */
 	public Cohort getCurrentUserRestrictedPatientSet() {
-		Set<RoleRestriction> restrictions = getCurrentUserRestrictions();
+		Set<RoleRestriction> restrictions = getCurrentUserActiveRestrictions();
 		if (restrictions == null)
 			return null;
 		Cohort ret = null;
@@ -193,4 +214,13 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	public SerializedObject getSerializedObjectByUuid(String uuid) {
 		return sodao.getSerializedObjectByUuid(uuid);
 	}
+
+	/**
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#retireRestrictionsWithCohortDefinition(CohortDefinition)
+	 */
+	@Override
+	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort) {
+		dao.retireRestrictionsWithCohortDefinition(cohort);
+	}
+
 }

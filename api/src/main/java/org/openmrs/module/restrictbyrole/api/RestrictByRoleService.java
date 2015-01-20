@@ -21,6 +21,7 @@ import org.openmrs.Patient;
 import org.openmrs.Role;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.api.db.SerializedObject;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,11 +70,18 @@ public interface RestrictByRoleService extends OpenmrsService {
 	public List<RoleRestriction> getRoleRestrictions();
 	
 	/**
-	 * Get the list of RoleRestrictions associated to a role
+	 * Get the list of RoleRestrictions associated to a role (including retired)
 	 * @param role Role to check the RoleRestrictions for
 	 * @return List of RoleRestrictions
 	 */
 	public List<RoleRestriction> getRoleRestrictions(Role role);
+	
+	/**
+	 * Get the list of active RoleRestrictions associated to a role
+	 * @param role Role to check the RoleRestrictions for
+	 * @return List of RoleRestrictions
+	 */
+	public List<RoleRestriction> getActiveRoleRestrictions(Role role);
 	
 	/**
 	 * Check if the current user has permission to view/edit the patient provided as parameter
@@ -90,10 +98,16 @@ public interface RestrictByRoleService extends OpenmrsService {
 	public boolean doesCurrentUserHavePermission(Integer patientId);
 
 	/**
-	 * Get the list of RoleRestrictions associated to the current user
+	 * Get the list of RoleRestrictions associated to the current user (including retired)
 	 * @return List of RoleRestrictions
 	 */
 	public Set<RoleRestriction> getCurrentUserRestrictions();
+	
+	/**
+	 * Get the list of active RoleRestrictions associated to the current user
+	 * @return List of active RoleRestrictions
+	 */
+	public Set<RoleRestriction> getCurrentUserActiveRestrictions();
 	
 	/**
 	 * Get the cohort (list of ID's) that current user has permission for
@@ -120,4 +134,10 @@ public interface RestrictByRoleService extends OpenmrsService {
 	 * @return SerializedObject
 	 */
 	public SerializedObject getSerializedObjectByUuid(String uuid);
+	
+	/**
+	 * Retire all restrictions that contains the cohort definition
+	 * @param cohort The cohort definition
+	 */
+	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort);
 }

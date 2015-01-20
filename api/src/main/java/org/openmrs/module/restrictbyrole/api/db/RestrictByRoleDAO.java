@@ -16,6 +16,7 @@ package org.openmrs.module.restrictbyrole.api.db;
 import java.util.List;
 
 import org.openmrs.Role;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
 import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 
@@ -24,7 +25,7 @@ import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
  */
 public interface RestrictByRoleDAO {
 	
-public void createRoleRestriction(RoleRestriction roleRestriction);
+	public void createRoleRestriction(RoleRestriction roleRestriction);
 	
 	public void updateRoleRestriction(RoleRestriction roleRestriction);
 	
@@ -34,5 +35,7 @@ public void createRoleRestriction(RoleRestriction roleRestriction);
 	
 	public List<RoleRestriction> getRoleRestrictions();
 
-	public List<RoleRestriction> getRoleRestrictions(Role role);
+	public List<RoleRestriction> getRoleRestrictions(Role role, Boolean includeRetired);
+	
+	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort);
 }

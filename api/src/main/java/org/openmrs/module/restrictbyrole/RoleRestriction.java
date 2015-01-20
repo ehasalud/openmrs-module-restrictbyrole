@@ -14,14 +14,15 @@
 package org.openmrs.module.restrictbyrole;
 
 import java.io.Serializable;
-import org.openmrs.BaseOpenmrsObject;
+
+import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.Role;
 import org.openmrs.api.db.SerializedObject;
 
 /**
  * The class represents a restriction associated to a role.
  */
-public class RoleRestriction extends BaseOpenmrsObject implements Serializable {
+public class RoleRestriction extends BaseOpenmrsMetadata implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	

@@ -20,6 +20,8 @@
 		    <column name="cohort_uuid" />
 		</many-to-one>
 		
+		<property name="retired" type="java.lang.Boolean" column="retired"/>
+		
 		<property name="uuid" type="java.lang.String" column="uuid" length="36" not-null="true"/>
 	</class>
 

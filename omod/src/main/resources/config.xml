@@ -65,6 +65,10 @@
 		<point>org.openmrs.api.EncounterService</point>
 		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.GetEncounterAdvisor</class>
 	</advice>
+	<advice>
+		<point>org.openmrs.module.reporting.definition.service.SerializedDefinitionService</point>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.PurgeCohortDefinitionAdvisor</class>
+	</advice>
 	<!-- /AOP -->
 
 	<!-- Internationalization -->
