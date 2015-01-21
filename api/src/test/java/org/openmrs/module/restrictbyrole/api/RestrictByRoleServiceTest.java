@@ -14,8 +14,15 @@
 package org.openmrs.module.restrictbyrole.api;
 
 import static org.junit.Assert.*;
+
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Role;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.restrictbyrole.RoleRestriction;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
@@ -27,4 +34,97 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 	public void shouldSetupContext() {
 		assertNotNull(Context.getService(RestrictByRoleService.class));
 	}
+	
+	@Test
+	public void shouldGetRoleRestrictions() throws Exception {
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		List<RoleRestriction> list = service.getRoleRestrictions();
+		
+		Assert.assertEquals(9, list.size());
+	}
+	
+	@Test
+	public void shouldGetRoleRestrictionById() throws Exception {
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		RoleRestriction rr = service.getRoleRestriction(1);
+		
+		Assert.assertNotNull(rr);
+		Assert.assertEquals(new Integer(1), rr.getId());
+	}
+	
+	@Test
+	public void shouldDeleteRoleRestrictionById() throws Exception {
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		RoleRestriction rr = service.getRoleRestriction(1);
+		
+		service.deleteRoleRestriction(rr);
+		
+		RoleRestriction newRr = service.getRoleRestriction(rr.getId());
+		
+		Assert.assertNull(newRr);
+		
+	}
+	
+	@Test
+	public void shouldGetRoleRestrictionsByRole() throws Exception {
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		Role restricted = new Role("Restricted");
+		List<RoleRestriction> list = service.getRoleRestrictions(restricted);
+		
+		Assert.assertEquals(4, list.size());
+		Assert.assertEquals("Restricted", list.get(0).getRole().getName());
+		
+		List<RoleRestriction> activeList = service.getActiveRoleRestrictions(restricted);
+		
+		Assert.assertEquals(3, activeList.size());
+		Assert.assertEquals("Restricted", activeList.get(0).getRole().getName());
+	}
+	
+	@Test
+	public void shouldGetCurrentUserRestrictions() throws Exception{
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		
+		if(Context.isAuthenticated()){
+			Context.logout();
+		}
+		
+		Context.authenticate("restrict", "Byrole123");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		
+		Set<RoleRestriction> list = service.getCurrentUserRestrictions();
+		Assert.assertEquals(3, list.size());
+		
+		Set<RoleRestriction> activeList = service.getCurrentUserActiveRestrictions();
+		Assert.assertEquals(2, activeList.size());
+	}
+	
+	@Test
+	public void shouldGetCurrentUserRestrictions_multipleRoles() throws Exception {
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		executeDataSet("org/openmrs/module/restrictbyrole/include/AddExtraRole.xml");
+		
+		if(Context.isAuthenticated()){
+			Context.logout();
+		}
+		
+		Context.authenticate("restrict", "Byrole123");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		
+		Set<RoleRestriction> list = service.getCurrentUserRestrictions();
+		Assert.assertEquals(7, list.size());
+		
+		Set<RoleRestriction> activeList = service.getCurrentUserActiveRestrictions();
+		Assert.assertEquals(5, activeList.size());
+	}
+
 }

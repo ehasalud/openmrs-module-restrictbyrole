@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+	<role role="Restricted" description="Test role for RestrictByRole" uuid="dee56f62-a14b-11e4-89d3-123b93f75cba"/>
+	<role role="TestRbR" description="Another test role for RestrictByRole" uuid="3145a757-519b-4ee6-9226-7e7945426525"/>
+	<person person_id="10" gender="" birthdate="1975-06-30" birthdate_estimated="false" dead="false" date_created="2005-01-01 00:00:00.0" voided="false" uuid="b8eb46d5-2cfb-4739-84e4-cd1773b85aea"/>
+  	<users user_id="10" person_id="10" system_id="10" username="restrict" password="72c48936abec635a9362a6e3a4992c9b458e37c77b351192db1affda3f89ab3a4f87006cf48a63cb8b75c1f8350f42d089e7422dba848cc79949b3db532c3dd8" salt="bc19e1938d75fb5848cdc269877c051ef3225a907ef6cb3cd2381afc38220bb6a666cb9a13b2fe3d1ce0d0751f93a242d9d5f6d544d1482db8d122d495e2e3e1" secret_question="" creator="1" date_created="2005-01-01 00:00:00.0" changed_by="1" date_changed="2007-09-20 21:54:12.0" retired="false" retire_reason="" uuid="3e44c2f5-78f0-411e-bdf7-d8040ad8bf8e"/>
+  	<user_role user_id="10" role="TestRbR"/>
+  	<restrictbyrole_role_restriction role_restriction_id="1" role="Provider" cohort_uuid="cf6bc911-0b5e-4ec6-94cf-d043775dd3dd" retired="false" uuid="cf6bc911-0b5e-4ec6-94cf-d043775dd3dd"/>
+  	<restrictbyrole_role_restriction role_restriction_id="2" role="Provider" cohort_uuid="1dbb34ca-2ae7-425c-9c94-b8625c9051a9" retired="false" uuid="6666666666666666666666"/>
+  	<restrictbyrole_role_restriction role_restriction_id="3" role="Restricted" cohort_uuid="1dbb34ca-2ae7-425c-9c94-b8625c9051a9" retired="false" uuid="dee5726e-a14b-11e4-89d3-123b93f75cba"/>
+  	<restrictbyrole_role_restriction role_restriction_id="4" role="Restricted" cohort_uuid="dee5793a-a14b-11e4-89d3-123b93f75cba" retired="false" uuid="dee57520-a14b-11e4-89d3-123b93f75cba"/>
+  	<restrictbyrole_role_restriction role_restriction_id="5" role="Restricted" cohort_uuid="dee581a0-a14b-11e4-89d3-123b93f75cba" retired="false" uuid="dee57eb2-a14b-11e4-89d3-123b93f75cba"/>
+  	<restrictbyrole_role_restriction role_restriction_id="6" role="Restricted" cohort_uuid="dee58af6-a14b-11e4-89d3-123b93f75cba" retired="true" uuid="dee58808-a14b-11e4-89d3-123b93f75cba"/>
+  	<restrictbyrole_role_restriction role_restriction_id="7" role="TestRbR" cohort_uuid="0f0ed0b0-0491-4a79-8df3-c35ec814dafd" retired="false" uuid="2ac3d448-ec9d-473f-827c-067742a09199"/>
+  	<restrictbyrole_role_restriction role_restriction_id="8" role="TestRbR" cohort_uuid="714e85b0-2d96-4b47-8c1f-aa995ddb6ecb" retired="false" uuid="34e47542-b727-4075-8281-b78648d1e353"/>
+  	<restrictbyrole_role_restriction role_restriction_id="9" role="TestRbR" cohort_uuid="b38a2b51-8a67-4460-b197-22b462060d93" retired="true" uuid="614b351e-6b3a-47ac-b61d-580ccbe4f0b4"/>
+  	
+</dataset>

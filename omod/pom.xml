@@ -20,7 +20,7 @@
 			<artifactId>${project.parent.artifactId}-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-							
+
 		<!-- End OpenMRS modules -->
 		
 
