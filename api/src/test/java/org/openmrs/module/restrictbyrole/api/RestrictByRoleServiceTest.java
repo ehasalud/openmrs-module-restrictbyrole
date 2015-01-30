@@ -24,6 +24,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
+import org.openmrs.module.restrictbyrole.UserRestrictionResult;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
@@ -101,10 +102,10 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 		
 		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
 		
-		Set<RoleRestriction> list = service.getCurrentUserRestrictions();
+		Set<RoleRestriction> list = service.getCurrentUserRestrictions(true);
 		Assert.assertEquals(3, list.size());
 		
-		Set<RoleRestriction> activeList = service.getCurrentUserActiveRestrictions();
+		Set<RoleRestriction> activeList = service.getCurrentUserRestrictions(false);
 		Assert.assertEquals(2, activeList.size());
 	}
 	
@@ -121,10 +122,10 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 		
 		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
 		
-		Set<RoleRestriction> list = service.getCurrentUserRestrictions();
+		Set<RoleRestriction> list = service.getCurrentUserRestrictions(true);
 		Assert.assertEquals(7, list.size());
 		
-		Set<RoleRestriction> activeList = service.getCurrentUserActiveRestrictions();
+		Set<RoleRestriction> activeList = service.getCurrentUserRestrictions(false);
 		Assert.assertEquals(5, activeList.size());
 	}
 	
@@ -140,9 +141,11 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 		Context.authenticate("restrict", "Byrole123");
 		
 		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		service.invalidateGetUserRestrictedPatientSetCache();
 		
-		Cohort cohort = service.getCurrentUserRestrictedPatientSet();
-		Assert.assertEquals(2, cohort.getSize());
+		UserRestrictionResult result = service.getCurrentUserRestrictionResult();
+		Assert.assertTrue(result.isRestricted());
+		Assert.assertEquals(2, result.getCohort().getSize());
 		
 	}
 	
@@ -159,9 +162,11 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 		Context.authenticate("restrict", "Byrole123");
 		
 		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		service.invalidateGetUserRestrictedPatientSetCache();
 		
-		Cohort cohort = service.getCurrentUserRestrictedPatientSet();
-		Assert.assertEquals(1, cohort.getSize());
+		UserRestrictionResult result = service.getCurrentUserRestrictionResult();
+		Assert.assertTrue(result.isRestricted());
+		Assert.assertEquals(1, result.getCohort().getSize());
 		
 	}
 

@@ -27,6 +27,7 @@ import org.openmrs.Cohort;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PatientSetService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.restrictbyrole.UserRestrictionResult;
 import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -55,16 +56,18 @@ public class GetManyPatientsAdvisor extends StaticMethodMatcherPointcutAdvisor i
 	private class GetManyPatientAdvice implements MethodInterceptor {
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			RestrictByRoleService service = (RestrictByRoleService) Context.getService(RestrictByRoleService.class);
-			Cohort restrictedResult = service.getCurrentUserRestrictedPatientSet();
-			if (restrictedResult == null)
+			UserRestrictionResult result = service.getCurrentUserRestrictionResult();
+			if (!result.isRestricted())
 				return invocation.proceed();
 			if (invocation.getMethod().getName().equals("getAllPatients")) {
-				return restrictedResult;
+				return result.getCohort();
 			} else { // "findPatients"
 				List<Patient> originalResult = (List<Patient>) invocation.proceed();
+				Cohort restriction = result.getCohort();
+				
 				List<Patient> newResult = new ArrayList<Patient>();
 				for (Patient p : originalResult)
-					if (restrictedResult.contains(p.getPatientId()))
+					if (restriction.contains(p.getPatientId()))
 						newResult.add(p);
 				return newResult;
 			}

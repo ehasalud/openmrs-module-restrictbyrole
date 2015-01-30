@@ -14,15 +14,16 @@
 package org.openmrs.module.restrictbyrole.advice;
 
 import java.lang.reflect.Method;
+
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Cohort;
 import org.openmrs.Encounter;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.restrictbyrole.UserRestrictionResult;
 import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -50,14 +51,14 @@ public class GetEncounterAdvisor extends StaticMethodMatcherPointcutAdvisor impl
 		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			RestrictByRoleService service = (RestrictByRoleService) Context.getService(RestrictByRoleService.class);
-			Cohort restrictedResult = service.getCurrentUserRestrictedPatientSet();
-			if (restrictedResult == null) {
+			UserRestrictionResult result = service.getCurrentUserRestrictionResult();
+			if (!result.isRestricted()) {
 				return invocation.proceed();
 			}
 			if (invocation.getMethod().getName().equals("getEncounter")) {
 				Encounter encounter = (Encounter) invocation.proceed();
 				Integer patientId = encounter.getPatient().getId();
-				if(restrictedResult.contains(patientId)){
+				if(result.getCohort().contains(patientId)){
 					return encounter;
 				}
 			}

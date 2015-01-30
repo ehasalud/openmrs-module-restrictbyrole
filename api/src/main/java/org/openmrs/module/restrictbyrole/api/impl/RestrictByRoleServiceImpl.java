@@ -16,6 +16,8 @@ package org.openmrs.module.restrictbyrole.api.impl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -23,6 +25,7 @@ import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionSe
 import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.SerializedObject;
 import org.openmrs.api.db.SerializedObjectDAO;
@@ -32,9 +35,14 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.serializer.ReportingSerializer;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
+import org.openmrs.module.restrictbyrole.UserRestrictionResult;
 import org.openmrs.module.restrictbyrole.api.RestrictByRoleService;
 import org.openmrs.module.restrictbyrole.api.db.RestrictByRoleDAO;
 import org.openmrs.serialization.SerializationException;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * It is a default implementation of {@link RestrictByRoleService}.
@@ -103,7 +111,7 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	public List<RoleRestriction> getActiveRoleRestrictions(Role role) {
 		return getDao().getRoleRestrictions(role, false);
 	}
-
+	
 	/**
 	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#updateRoleRestriction(RoleRestriction)
 	 */
@@ -122,39 +130,39 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#doesCurrentUserHavePermission(Integer)
 	 */
 	public boolean doesCurrentUserHavePermission(Integer patientId) {
-		Cohort ps = getCurrentUserRestrictedPatientSet();
-		if (ps == null)
+		UserRestrictionResult urr = getCurrentUserRestrictionResult();
+		if(!urr.isRestricted())
 			return true;
 		else
-			return ps.contains(patientId);
+			return urr.getCohort().contains(patientId);
 	}
 	
 	/**
-	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserRestrictions()
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getUserRestrictions(User,boolean)
 	 */
-	public Set<RoleRestriction> getCurrentUserRestrictions() {
-		if (!Context.isAuthenticated())
+	public Set<RoleRestriction> getUserRestrictions(User user, boolean includeRetired) {
+		if (user == null)
 			return null;
-		Set<Role> roles = Context.getAuthenticatedUser().getAllRoles();
+		Set<Role> roles = user.getAllRoles();
 		Set<RoleRestriction> ret = new HashSet<RoleRestriction>();
-		for (Role role : roles)
-			ret.addAll(getRoleRestrictions(role));
+		for (Role role : roles){
+			if(includeRetired)
+				ret.addAll(getRoleRestrictions(role));
+			else
+				ret.addAll(getActiveRoleRestrictions(role));
+		}			
 		log.debug("current user has " + ret.size() + " restrictions");
 		return ret;
 	}
+	
 	/**
-	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserActiveRestrictions()
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserRestrictions(boolean)
 	 */
-	@Override
-	public Set<RoleRestriction> getCurrentUserActiveRestrictions() {
+	public Set<RoleRestriction> getCurrentUserRestrictions(boolean includeRetired) {
 		if (!Context.isAuthenticated())
 			return null;
-		Set<Role> roles = Context.getAuthenticatedUser().getAllRoles();
-		Set<RoleRestriction> ret = new HashSet<RoleRestriction>();
-		for (Role role : roles)
-			ret.addAll(getActiveRoleRestrictions(role));
-		log.debug("current user has " + ret.size() + " active restrictions");
-		return ret;
+		User currentUser = Context.getAuthenticatedUser();
+		return getUserRestrictions(currentUser, includeRetired);
 	}
 	
 	/**
@@ -163,16 +171,44 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	public List<SerializedObject> getAllSerializedObjects(){
 		return sodao.getAllSerializedObjects(CohortDefinition.class, false);
 	}
+	
+	/**
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getUserRestrictionResult(User)
+	 */
+	public UserRestrictionResult getUserRestrictionResult(User user){
+		
+		// This method can take a long time to execute, so the result is cached
+		try {
+			return cachedUserRestrictionResult.get(user);
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
-	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserRestrictedPatientSet()
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#getCurrentUserRestrictionResult()
 	 */
-	public Cohort getCurrentUserRestrictedPatientSet() {
-		Set<RoleRestriction> restrictions = getCurrentUserActiveRestrictions();
-		if (restrictions == null)
+	public UserRestrictionResult getCurrentUserRestrictionResult() {
+		if (!Context.isAuthenticated())
 			return null;
-		Cohort ret = null;
+		User currentUser = Context.getAuthenticatedUser();
+		return getUserRestrictionResult(currentUser);
+	}
+	
+	/**
+	 * This is the method that performs the evaluation of user restrictions and 
+	 * generate the restricted patient set for the user. This method is accessed 
+	 * through a cache in order to improve performance
+	 * @param user User to be evaluated
+	 * @return UserRestrictionResult associated to the user
+	 */
+	private UserRestrictionResult generateUserRestrictiontResult(User user){
+		Set<RoleRestriction> restrictions = getUserRestrictions(user, false);
+		if (restrictions == null || restrictions.size() == 0)
+			return new UserRestrictionResult(user, false);
 		
+		Cohort ret = null;
 		for (RoleRestriction restriction : restrictions) {
 					
 			try {
@@ -193,7 +229,7 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 			
 		}
 				
-		return ret;
+		return new UserRestrictionResult(user, true, ret);		
 	}
 
 	/**
@@ -217,5 +253,21 @@ public class RestrictByRoleServiceImpl extends BaseOpenmrsService implements Res
 	public void retireRestrictionsWithCohortDefinition(CohortDefinition cohort) {
 		dao.retireRestrictionsWithCohortDefinition(cohort);
 	}
-
+	
+	/**
+	 * @see org.openmrs.module.restrictbyrole.api.RestrictByRoleService#invalidateGetUserRestrictedPatientSetCache();
+	 */
+	public void invalidateGetUserRestrictedPatientSetCache(){
+		this.cachedUserRestrictionResult.invalidateAll();
+	}
+	
+	private LoadingCache<User, UserRestrictionResult> cachedUserRestrictionResult = CacheBuilder.newBuilder()
+			.expireAfterWrite(1, TimeUnit.MINUTES)
+			.build(
+					new CacheLoader<User, UserRestrictionResult>() {
+						public UserRestrictionResult load (User user){
+							return generateUserRestrictiontResult(user);
+						}
+					});
+	
 }

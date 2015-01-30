@@ -19,10 +19,12 @@ import java.util.Set;
 import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.api.db.SerializedObject;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
+import org.openmrs.module.restrictbyrole.UserRestrictionResult;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -98,22 +100,37 @@ public interface RestrictByRoleService extends OpenmrsService {
 	public boolean doesCurrentUserHavePermission(Integer patientId);
 
 	/**
-	 * Get the list of RoleRestrictions associated to the current user (including retired)
+	 * Get the list of RoleRestrictions associated to the user
+	 * @param user User to be evaluated
+	 * @param includeRetired If include retired restrictions or not
 	 * @return List of RoleRestrictions
 	 */
-	public Set<RoleRestriction> getCurrentUserRestrictions();
+	public Set<RoleRestriction> getUserRestrictions(User user, boolean includeRetired);
 	
 	/**
-	 * Get the list of active RoleRestrictions associated to the current user
-	 * @return List of active RoleRestrictions
+	 * Get the list of RoleRestrictions associated to the current user
+	 * @param includeRetired If include retired restrictions or not
+	 * @return List of RoleRestrictions
 	 */
-	public Set<RoleRestriction> getCurrentUserActiveRestrictions();
+	public Set<RoleRestriction> getCurrentUserRestrictions(boolean includeRetired);
+	
+	/**
+	 * Get the cohort (list of ID's) that passed user has permission for
+	 * @param user User to be evaluated
+	 * @return associated to the user
+	 */
+	public UserRestrictionResult getUserRestrictionResult(User user);
 	
 	/**
 	 * Get the cohort (list of ID's) that current user has permission for
 	 * @return Cohort associated to current user
 	 */
-	public Cohort getCurrentUserRestrictedPatientSet();
+	public UserRestrictionResult getCurrentUserRestrictionResult();
+	
+	/**
+	 * Invalidates any cache for the method {@link getUserRestrictedPatientSet(User)} (if used)
+	 */
+	public void invalidateGetUserRestrictedPatientSetCache();
 	
 	/**
 	 * Get all SerializedObjects
