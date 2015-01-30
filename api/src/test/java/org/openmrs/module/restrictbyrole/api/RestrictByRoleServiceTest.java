@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Cohort;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.restrictbyrole.RoleRestriction;
@@ -125,6 +126,43 @@ public class  RestrictByRoleServiceTest extends BaseModuleContextSensitiveTest {
 		
 		Set<RoleRestriction> activeList = service.getCurrentUserActiveRestrictions();
 		Assert.assertEquals(5, activeList.size());
+	}
+	
+	@Test
+	public void shouldGetCurrentUserRestrictedPatientSet() throws Exception{
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		executeDataSet("org/openmrs/module/restrictbyrole/include/CohortQueries.xml");
+		
+		if(Context.isAuthenticated()){
+			Context.logout();
+		}
+		
+		Context.authenticate("restrict", "Byrole123");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		
+		Cohort cohort = service.getCurrentUserRestrictedPatientSet();
+		Assert.assertEquals(2, cohort.getSize());
+		
+	}
+	
+	@Test
+	public void shouldGetCurrentUserRestrictedPatientSet_multipleRoles() throws Exception{
+		executeDataSet("org/openmrs/module/restrictbyrole/include/RestrictByRoleRecords.xml");
+		executeDataSet("org/openmrs/module/restrictbyrole/include/CohortQueries.xml");
+		executeDataSet("org/openmrs/module/restrictbyrole/include/AddExtraRole.xml");
+
+		if(Context.isAuthenticated()){
+			Context.logout();
+		}
+		
+		Context.authenticate("restrict", "Byrole123");
+		
+		RestrictByRoleService service = Context.getService(RestrictByRoleService.class);
+		
+		Cohort cohort = service.getCurrentUserRestrictedPatientSet();
+		Assert.assertEquals(1, cohort.getSize());
+		
 	}
 
 }
