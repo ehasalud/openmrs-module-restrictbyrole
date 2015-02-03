@@ -48,12 +48,24 @@ public class GetPatientAdvisor extends StaticMethodMatcherPointcutAdvisor implem
 		public void before(Method m, Object[] args, Object target) throws Throwable {
 			RestrictByRoleService service = (RestrictByRoleService) Context.getService(RestrictByRoleService.class);
 			Integer patientId = null;
-			if (m.getName().equals("getPatient"))
+			if (args[0] instanceof Integer) {
 				patientId = (Integer) args[0];
-			else
+			}
+			else if (args[0] instanceof Patient) {
 				patientId = ((Patient) args[0]).getPatientId();
-			if (patientId != null && !service.doesCurrentUserHavePermission(patientId))
+			} else {
+				throw new RestrictByRoleAuthorizationException("Unknown identifier for patient");
+			}
+			
+			// Exception for Xform module. 
+			// When registering a patient with Xforms, it calls "getPatient" method with id 0
+			if (patientId != null && patientId == 0) {
+				return;
+			}
+			
+			if (patientId != null && !service.doesCurrentUserHavePermission(patientId)) {
 				throw new RestrictByRoleAuthorizationException("No permission on " + patientId);
+			}
 		}
 	}
 
