@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>restrictbyrole</artifactId>
-	<version>2.1</version>
+	<version>2.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Restrict By Role Module</name>
 	<description>Allow roles to be restricted to viewing only patients that match a saved patient search.</description>
@@ -22,9 +22,10 @@
 	</organization>
 
 	<scm>
-		<connection>scm:svn:https://svn.openmrs.org/openmrs-modules/restrictbyrole/trunk/</connection>
-		<developerConnection>scm:svn:https://svn.openmrs.org/openmrs-modules/restrictbyrole/trunk/</developerConnection>
-		<url>https://svn.openmrs.org/openmrs-modules/restrictbyrole/trunk/</url>
+		<connection>scm:git:https://github.com/ehasalud/openmrs-module-restrictbyrole/</connection>
+		<developerConnection>scm:git:https://github.com/ehasalud/openmrs-module-restrictbyrole/</developerConnection>
+		<url>https://github.com/ehasalud/openmrs-module-restrictbyrole/</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<modules>
